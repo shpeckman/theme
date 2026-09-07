@@ -1,5 +1,7 @@
 # spec/color_spec.cr
 require "./spec_helper"
+require "json"
+require "yaml"
 
 describe Theme::Color do
   describe ".parse" do
@@ -72,6 +74,21 @@ describe Theme::Color do
 
     it do
       Theme::Color.new(255, 255, 255).perceived_luminance.should be_close(1.0, 0.0001)
+    end
+  end
+
+  describe "Serialization" do
+    it "serializes and deserializes JSON" do
+      color = Theme::Color.new(255, 0, 68)
+      json  = color.to_json
+      json.should eq %("#ff0044")
+      Theme::Color.from_json(json).should eq color
+    end
+
+    it "serializes and deserializes YAML" do
+      color = Theme::Color.new(255, 0, 68)
+      yaml  = color.to_yaml
+      Theme::Color.from_yaml(yaml).should eq color
     end
   end
 end

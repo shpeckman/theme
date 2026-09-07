@@ -1,5 +1,7 @@
 # spec/scheme_spec.cr
 require "./spec_helper"
+require "json"
+require "yaml"
 
 describe Theme::Scheme do
   describe ".from_hex" do
@@ -115,5 +117,42 @@ describe Theme::Scheme do
       harmonious.size.should eq 256
     end
   end
-end
 
+  describe "Serialization" do
+    it "serializes and deserializes JSON" do
+      palette = StaticArray(Theme::Color, 16).new { |i| Theme::Color.new(i.to_u8, i.to_u8, i.to_u8) }
+      scheme = Theme::Scheme.new(
+        palette: palette,
+        name: "Test Scheme",
+        foreground: Theme::Color.new(200, 200, 200),
+        background: Theme::Color.new(30, 30, 30)
+      )
+
+      json    = scheme.to_json
+      decoded = Theme::Scheme.from_json(json)
+
+      decoded.name.should eq "Test Scheme"
+      decoded.foreground.should eq Theme::Color.new(200, 200, 200)
+      decoded.background.should eq Theme::Color.new(30, 30, 30)
+      16.times { |i| decoded.palette[i].should eq palette[i] }
+    end
+
+    it "serializes and deserializes YAML" do
+      palette = StaticArray(Theme::Color, 16).new { |i| Theme::Color.new(i.to_u8, i.to_u8, i.to_u8) }
+      scheme = Theme::Scheme.new(
+        palette: palette,
+        name: "Test Scheme",
+        foreground: Theme::Color.new(200, 200, 200),
+        background: Theme::Color.new(30, 30, 30)
+      )
+
+      yaml    = scheme.to_yaml
+      decoded = Theme::Scheme.from_yaml(yaml)
+
+      decoded.name.should eq "Test Scheme"
+      decoded.foreground.should eq Theme::Color.new(200, 200, 200)
+      decoded.background.should eq Theme::Color.new(30, 30, 30)
+      16.times { |i| decoded.palette[i].should eq palette[i] }
+    end
+  end
+end

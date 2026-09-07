@@ -1,4 +1,7 @@
 # src/theme/color.cr
+require "json"
+require "yaml"
+
 struct Theme::Color
   HEX_DIGITS = "0123456789abcdef".to_slice
 
@@ -41,6 +44,23 @@ struct Theme::Color
 
   def perceived_luminance : Float64
     (0.299 * @r + 0.587 * @g + 0.114 * @b) / 255.0
+  end
+
+  def to_json(json : JSON::Builder)
+    json.string(hex)
+  end
+
+  def self.new(pull : JSON::PullParser)
+    parse(pull.read_string)
+  end
+
+  def to_yaml(yaml : YAML::Nodes::Builder)
+    yaml.scalar(hex)
+  end
+
+  def self.new(ctx : YAML::ParseContext, node : YAML::Nodes::Node)
+    node.raise("Expected scalar") unless node.is_a?(YAML::Nodes::Scalar)
+    parse(node.value)
   end
 
   private def component_luminance(c : UInt8) : Float64

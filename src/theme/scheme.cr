@@ -1,6 +1,49 @@
 # src/theme/scheme.cr
+require "json"
+require "yaml"
+
 class Theme::Scheme
-  getter name    : String?
+  include JSON::Serializable
+  include YAML::Serializable
+
+  module PaletteConverter
+    def self.to_json(value : StaticArray(Color, 16), json : JSON::Builder)
+      json.array do
+        value.each &.to_json(json)
+      end
+    end
+
+    def self.from_json(pull : JSON::PullParser) : StaticArray(Color, 16)
+      colors = Array(Color).new(pull)
+      if colors.size != 16
+        raise JSON::ParseException.new("Expected exactly 16 colors for palette, got #{colors.size}", pull.line_number, pull.column_number)
+      end
+
+      palette = uninitialized StaticArray(Color, 16)
+      16.times { |i| palette[i] = colors[i] }
+      palette
+    end
+
+    def self.to_yaml(value : StaticArray(Color, 16), yaml : YAML::Nodes::Builder)
+      yaml.sequence do
+        value.each &.to_yaml(yaml)
+      end
+    end
+
+    def self.from_yaml(ctx : YAML::ParseContext, node : YAML::Nodes::Node) : StaticArray(Color, 16)
+      colors = Array(Color).new(ctx, node)
+      node.raise("Expected exactly 16 colors for palette, got #{colors.size}") if colors.size != 16
+
+      palette = uninitialized StaticArray(Color, 16)
+      16.times { |i| palette[i] = colors[i] }
+      palette
+    end
+  end
+
+  getter name : String?
+
+  @[JSON::Field(converter: Theme::Scheme::PaletteConverter)]
+  @[YAML::Field(converter: Theme::Scheme::PaletteConverter)]
   getter palette : StaticArray(Color, 16)
 
   {% for field in %w(foreground background) %}
@@ -10,14 +53,19 @@ class Theme::Scheme
     end
   {% end %}
 
-  @_generated_256            : StaticArray(Color, 256)?
+  @[JSON::Field(ignore: true)]
+  @[YAML::Field(ignore: true)]
+  @_generated_256 : StaticArray(Color, 256)?
+
+  @[JSON::Field(ignore: true)]
+  @[YAML::Field(ignore: true)]
   @_generated_256_harmonious : StaticArray(Color, 256)?
 
   def initialize(
     @palette : StaticArray(Color, 16),
     @name : String? = nil,
     @foreground : Color? = nil,
-    @background : Color? = nil
+    @background : Color? = nil,
   )
   end
 
@@ -25,7 +73,7 @@ class Theme::Scheme
     palette : Indexable(String),
     name : String? = nil,
     foreground : String? = nil,
-    background : String? = nil
+    background : String? = nil,
   ) : self
     raise ArgumentError.new("Palette must contain exactly 16 colors") if palette.size != 16
 
@@ -106,4 +154,3 @@ class Theme::Scheme
     result
   end
 end
-
