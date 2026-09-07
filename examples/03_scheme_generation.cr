@@ -29,4 +29,3 @@ puts "Standard ANSI color 200:   #{standard_256[200].hex}"
 puts "Harmonious ANSI color 200: #{harmonious_256[200].hex}"
 puts
 puts "Notice how the generated colors differ slightly in harmonious mode to better match the theme's background and foreground properties."
-

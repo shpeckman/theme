@@ -30,11 +30,10 @@ transition_frames = dark_theme.fade_to(light_theme, steps)
 transition_frames.each_with_index do |frame, index|
   bg = frame.background_hex
   fg = frame.foreground_hex
-  
+
   # Grabbing a couple palette colors to show they interpolate too
   c1 = frame[0].hex
   c2 = frame[8].hex
-  
+
   puts "Frame #{index + 1}: BG #{bg} | FG #{fg} | Palette[0] #{c1} | Palette[8] #{c2}"
 end
-

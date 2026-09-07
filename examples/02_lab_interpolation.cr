@@ -19,11 +19,10 @@ puts
 steps.times do |i|
   # Calculate interpolation factor from 0.0 to 1.0
   t = i / (steps - 1).to_f64
-  
+
   # Interpolate in Lab color space, then convert back to RGB
-  blended_lab = lab1.lerp(lab2, t)
+  blended_lab   = lab1.lerp(lab2, t)
   blended_color = blended_lab.to_color
-  
+
   puts "Step #{i + 1} (t=#{t.round(2)}): #{blended_color.hex}"
 end
-

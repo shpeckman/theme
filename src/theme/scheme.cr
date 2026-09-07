@@ -3,12 +3,12 @@ class Theme::Scheme
   getter name    : String?
   getter palette : StaticArray(Color, 16)
 
-  {% for field in %w(foreground background cursor cursor_text selection_foreground selection_background) %}
-      getter {{field.id}} : Color?
-      def {{field.id}}_hex : String?
-        @{{field.id}}.try(&.hex)
-      end
-    {% end %}
+  {% for field in %w(foreground background) %}
+    getter {{field.id}} : Color?
+    def {{field.id}}_hex : String?
+      @{{field.id}}.try(&.hex)
+    end
+  {% end %}
 
   @_generated_256            : StaticArray(Color, 256)?
   @_generated_256_harmonious : StaticArray(Color, 256)?
@@ -18,10 +18,6 @@ class Theme::Scheme
     @name : String? = nil,
     @foreground : Color? = nil,
     @background : Color? = nil,
-    @cursor : Color? = nil,
-    @cursor_text : Color? = nil,
-    @selection_foreground : Color? = nil,
-    @selection_background : Color? = nil,
   )
   end
 
@@ -50,11 +46,7 @@ class Theme::Scheme
       palette: palette,
       name: a.name,
       foreground: interpolate_color(a.foreground, b.foreground, t),
-      background: interpolate_color(a.background, b.background, t),
-      cursor: interpolate_color(a.cursor, b.cursor, t),
-      cursor_text: interpolate_color(a.cursor_text, b.cursor_text, t),
-      selection_foreground: interpolate_color(a.selection_foreground, b.selection_foreground, t),
-      selection_background: interpolate_color(a.selection_background, b.selection_background, t)
+      background: interpolate_color(a.background, b.background, t)
     )
   end
 

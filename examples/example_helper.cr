@@ -12,4 +12,3 @@ def generate_mock_palette(base : Theme::Color) : StaticArray(Theme::Color, 16)
     )
   end
 end
-
