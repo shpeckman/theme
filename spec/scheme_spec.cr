@@ -2,6 +2,29 @@
 require "./spec_helper"
 
 describe Theme::Scheme do
+  describe ".from_hex" do
+    it do
+      palette = Array(String).new(16) { |i| sprintf("#%02x%02x%02x", i, i, i) }
+      scheme = Theme::Scheme.from_hex(
+        palette: palette,
+        name: "Hex Scheme",
+        foreground: "#cccccc",
+        background: "#222222"
+      )
+
+      scheme.name.should eq "Hex Scheme"
+      scheme.foreground_hex.should eq "#cccccc"
+      scheme.background_hex.should eq "#222222"
+      scheme[5].should eq Theme::Color.new(5, 5, 5)
+    end
+
+    it do
+      expect_raises(ArgumentError) do
+        Theme::Scheme.from_hex(palette: ["#000000"] * 15)
+      end
+    end
+  end
+
   describe "initialization" do
     it do
       palette = StaticArray(Theme::Color, 16).new { |i| Theme::Color.new(i.to_u8, i.to_u8, i.to_u8) }
@@ -93,3 +116,4 @@ describe Theme::Scheme do
     end
   end
 end
+

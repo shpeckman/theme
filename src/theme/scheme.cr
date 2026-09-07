@@ -17,8 +17,27 @@ class Theme::Scheme
     @palette : StaticArray(Color, 16),
     @name : String? = nil,
     @foreground : Color? = nil,
-    @background : Color? = nil,
+    @background : Color? = nil
   )
+  end
+
+  def self.from_hex(
+    palette : Indexable(String),
+    name : String? = nil,
+    foreground : String? = nil,
+    background : String? = nil
+  ) : self
+    raise ArgumentError.new("Palette must contain exactly 16 colors") if palette.size != 16
+
+    parsed_palette = uninitialized StaticArray(Color, 16)
+    16.times { |i| parsed_palette[i] = Color.parse(palette[i]) }
+
+    new(
+      palette: parsed_palette,
+      name: name,
+      foreground: foreground ? Color.parse(foreground) : nil,
+      background: background ? Color.parse(background) : nil
+    )
   end
 
   def [](index : Int) : Color
@@ -87,3 +106,4 @@ class Theme::Scheme
     result
   end
 end
+
