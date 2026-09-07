@@ -1,5 +1,5 @@
 # src/theme/color.cr
-struct Theme::Color
+struct Color
   HEX_DIGITS = "0123456789abcdef".to_slice
 
   getter r : UInt8, g : UInt8, b : UInt8
