@@ -77,6 +77,35 @@ describe Theme::Color do
     end
   end
 
+  describe ".from_floats" do
+    it do
+      Theme::Color.from_floats(1.0, 0.0, 0.0).should eq Theme::Color.new(255, 0, 0)
+    end
+
+    it do
+      Theme::Color.from_floats(0.5, 0.5, 0.5).should eq Theme::Color.new(128, 128, 128)
+    end
+
+    it "clamps out-of-range components" do
+      Theme::Color.from_floats(2.0, -1.0, 0.5).should eq Theme::Color.new(255, 0, 128)
+    end
+  end
+
+  describe ".from_p3" do
+    it "maps the P3 red primary to sRGB red" do
+      Theme::Color.from_p3(1.0, 0.0, 0.0).should eq Theme::Color.new(255, 0, 0)
+    end
+
+    it "maps white to white" do
+      Theme::Color.from_p3(1.0, 1.0, 1.0).should eq Theme::Color.new(255, 255, 255)
+    end
+
+    it "differs from a plain sRGB interpretation for mid tones" do
+      Theme::Color.from_p3(0.5, 0.5, 0.5).should eq Theme::Color.new(127, 128, 128)
+      Theme::Color.from_p3(0.2, 0.2, 0.2).should eq Theme::Color.new(51, 51, 51)
+    end
+  end
+
   describe "Serialization" do
     it "serializes and deserializes JSON" do
       color = Theme::Color.new(255, 0, 68)

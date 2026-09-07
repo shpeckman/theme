@@ -118,6 +118,63 @@ describe Theme::Scheme do
     end
   end
 
+  describe "cursor and selection colors" do
+    it "default to nil" do
+      palette = StaticArray(Theme::Color, 16).new { |i| Theme::Color.new(i.to_u8, i.to_u8, i.to_u8) }
+      scheme  = Theme::Scheme.new(palette)
+
+      scheme.cursor.should be_nil
+      scheme.cursor_text.should be_nil
+      scheme.selection_foreground.should be_nil
+      scheme.selection_background.should be_nil
+    end
+
+    it "can be set via the constructor and .from_hex" do
+      palette = StaticArray(Theme::Color, 16).new { |i| Theme::Color.new(i.to_u8, i.to_u8, i.to_u8) }
+      scheme  = Theme::Scheme.new(palette, cursor: Theme::Color.new(1, 2, 3))
+
+      scheme.cursor.should eq Theme::Color.new(1, 2, 3)
+      scheme.cursor_hex.should eq "#010203"
+
+      hexed = Theme::Scheme.from_hex(
+        palette: (0..15).map { |i| sprintf("#%02x0000", i) },
+        cursor: "#ffcc00",
+        selection_background: "#264f78"
+      )
+      hexed.cursor.should eq Theme::Color.new(255, 204, 0)
+      hexed.selection_background_hex.should eq "#264f78"
+    end
+
+    it "are omitted from JSON when nil" do
+      palette = StaticArray(Theme::Color, 16).new { |i| Theme::Color.new(i.to_u8, i.to_u8, i.to_u8) }
+      json    = Theme::Scheme.new(palette).to_json
+
+      json.should_not contain "cursor"
+      json.should_not contain "selection"
+    end
+
+    it "round-trip through JSON and YAML when present" do
+      palette = StaticArray(Theme::Color, 16).new { |i| Theme::Color.new(i.to_u8, i.to_u8, i.to_u8) }
+      scheme = Theme::Scheme.new(palette,
+        cursor: Theme::Color.new(255, 204, 0),
+        selection_background: Theme::Color.new(38, 79, 120))
+
+      Theme::Scheme.from_json(scheme.to_json).cursor.should eq Theme::Color.new(255, 204, 0)
+      Theme::Scheme.from_yaml(scheme.to_yaml).selection_background.should eq Theme::Color.new(38, 79, 120)
+    end
+
+    it "are interpolated by #fade_to" do
+      palette = StaticArray(Theme::Color, 16).new { |i| Theme::Color.new(i.to_u8, i.to_u8, i.to_u8) }
+      a       = Theme::Scheme.new(palette, cursor: Theme::Color.parse("#000000"))
+      b       = Theme::Scheme.new(palette, cursor: Theme::Color.parse("#ffffff"))
+
+      steps = a.fade_to(b, 3)
+      steps[0].cursor.should eq Theme::Color.parse("#000000")
+      steps[1].cursor.should eq Theme::Color.parse("#777777")
+      steps[2].cursor.should eq Theme::Color.parse("#ffffff")
+    end
+  end
+
   describe "Serialization" do
     it "serializes and deserializes JSON" do
       palette = StaticArray(Theme::Color, 16).new { |i| Theme::Color.new(i.to_u8, i.to_u8, i.to_u8) }

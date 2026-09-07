@@ -46,7 +46,7 @@ class Theme::Scheme
   @[YAML::Field(converter: Theme::Scheme::PaletteConverter)]
   getter palette : StaticArray(Color, 16)
 
-  {% for field in %w(foreground background) %}
+  {% for field in %w(foreground background cursor cursor_text selection_foreground selection_background) %}
     getter {{field.id}} : Color?
     def {{field.id}}_hex : String?
       @{{field.id}}.try(&.hex)
@@ -62,18 +62,26 @@ class Theme::Scheme
   @_generated_256_harmonious : StaticArray(Color, 256)?
 
   def initialize(
-    @palette : StaticArray(Color, 16),
-    @name : String? = nil,
-    @foreground : Color? = nil,
-    @background : Color? = nil,
+    @palette              : StaticArray(Color, 16),
+    @name                 : String? = nil,
+    @foreground           : Color?  = nil,
+    @background           : Color?  = nil,
+    @cursor               : Color?  = nil,
+    @cursor_text          : Color?  = nil,
+    @selection_foreground : Color?  = nil,
+    @selection_background : Color?  = nil,
   )
   end
 
   def self.from_hex(
-    palette : Indexable(String),
-    name : String? = nil,
-    foreground : String? = nil,
-    background : String? = nil,
+    palette              : Indexable(String),
+    name                 : String? = nil,
+    foreground           : String? = nil,
+    background           : String? = nil,
+    cursor               : String? = nil,
+    cursor_text          : String? = nil,
+    selection_foreground : String? = nil,
+    selection_background : String? = nil,
   ) : self
     raise ArgumentError.new("Palette must contain exactly 16 colors") if palette.size != 16
 
@@ -84,7 +92,11 @@ class Theme::Scheme
       palette: parsed_palette,
       name: name,
       foreground: foreground ? Color.parse(foreground) : nil,
-      background: background ? Color.parse(background) : nil
+      background: background ? Color.parse(background) : nil,
+      cursor: cursor ? Color.parse(cursor) : nil,
+      cursor_text: cursor_text ? Color.parse(cursor_text) : nil,
+      selection_foreground: selection_foreground ? Color.parse(selection_foreground) : nil,
+      selection_background: selection_background ? Color.parse(selection_background) : nil
     )
   end
 
@@ -113,7 +125,11 @@ class Theme::Scheme
       palette: palette,
       name: a.name,
       foreground: interpolate_color(a.foreground, b.foreground, t),
-      background: interpolate_color(a.background, b.background, t)
+      background: interpolate_color(a.background, b.background, t),
+      cursor: interpolate_color(a.cursor, b.cursor, t),
+      cursor_text: interpolate_color(a.cursor_text, b.cursor_text, t),
+      selection_foreground: interpolate_color(a.selection_foreground, b.selection_foreground, t),
+      selection_background: interpolate_color(a.selection_background, b.selection_background, t)
     )
   end
 
