@@ -14,14 +14,14 @@ class Theme::Scheme
   @_generated_256_harmonious : StaticArray(Color, 256)?
 
   def initialize(
-    @palette              : StaticArray(Color, 16),
-    @name                 : String? = nil,
-    @foreground           : Color?  = nil,
-    @background           : Color?  = nil,
-    @cursor               : Color?  = nil,
-    @cursor_text          : Color?  = nil,
-    @selection_foreground : Color?  = nil,
-    @selection_background : Color?  = nil,
+    @palette : StaticArray(Color, 16),
+    @name : String? = nil,
+    @foreground : Color? = nil,
+    @background : Color? = nil,
+    @cursor : Color? = nil,
+    @cursor_text : Color? = nil,
+    @selection_foreground : Color? = nil,
+    @selection_background : Color? = nil,
   )
   end
 
